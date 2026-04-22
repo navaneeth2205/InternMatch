@@ -55,8 +55,50 @@ const mockPool = {
     // Parse SQL to determine operation
     const sqlLower = sql.toLowerCase();
     
-    // SELECT queries
+    // SELECT queries — applications MUST be checked first because those queries
+    // also contain 'students', 'internships', and 'email' which would match wrong branches
     if (sqlLower.includes('select')) {
+      if (sqlLower.includes('applications')) {
+        if (sqlLower.includes('join students') && sqlLower.includes('join internships')) {
+          const companyId = Number(params[0]);
+          const result = applications
+            .filter(a => Number(internships.find(i => Number(i.id) === Number(a.internship_id))?.company_id) === companyId)
+            .map(a => ({
+              ...a,
+              student_name: students.find(s => Number(s.student_id) === Number(a.student_id))?.name || 'Unknown',
+              student_email: students.find(s => Number(s.student_id) === Number(a.student_id))?.email || 'Unknown',
+              skill_required: internships.find(i => Number(i.id) === Number(a.internship_id))?.skill_required || 'Unknown',
+              internship_location: internships.find(i => Number(i.id) === Number(a.internship_id))?.location || 'Unknown'
+            }));
+          return [result];
+        }
+        if (sqlLower.includes('join internships') && sqlLower.includes('join companies')) {
+          const studentId = Number(params[0]);
+          const result = applications
+            .filter(a => Number(a.student_id) === studentId)
+            .map(a => ({
+              ...a,
+              skill_required: internships.find(i => Number(i.id) === Number(a.internship_id))?.skill_required || 'Unknown',
+              stipend: internships.find(i => Number(i.id) === Number(a.internship_id))?.stipend || 0,
+              location: internships.find(i => Number(i.id) === Number(a.internship_id))?.location || 'Unknown',
+              duration: internships.find(i => Number(i.id) === Number(a.internship_id))?.duration || 'Unknown',
+              company_name: companies.find(c => Number(c.company_id) === Number(internships.find(i => Number(i.id) === Number(a.internship_id))?.company_id))?.company_name || 'Unknown'
+            }));
+          return [result];
+        }
+        // Duplicate-check: SELECT id FROM applications WHERE student_id = ? AND internship_id = ?
+        if (sqlLower.includes('student_id') && sqlLower.includes('internship_id')) {
+          const studentId = Number(params[0]);
+          const internshipId = Number(params[1]);
+          const found = applications.filter(a => Number(a.student_id) === studentId && Number(a.internship_id) === internshipId);
+          return [found];
+        }
+        // SELECT * FROM applications WHERE student_id = ?
+        if (sqlLower.includes('student_id') && params.length === 1) {
+          return [applications.filter(a => Number(a.student_id) === Number(params[0]))];
+        }
+        return [applications];
+      }
       if (sqlLower.includes('students') && sqlLower.includes('email')) {
         const email = params[0];
         return [students.filter(s => s.email === email)];
@@ -67,54 +109,15 @@ const mockPool = {
       }
       if (sqlLower.includes('internships')) {
         if (sqlLower.includes('join companies')) {
-          const result = internships.map(i => ({
-            ...i,
-            company_name: companies.find(c => c.company_id === i.company_id)?.company_name || 'Unknown'
-          }));
+          const result = internships
+            .filter(i => i.status === 'Active')
+            .map(i => ({
+              ...i,
+              company_name: companies.find(c => Number(c.company_id) === Number(i.company_id))?.company_name || 'Unknown'
+            }));
           return [result];
         }
         return [internships];
-      }
-      if (sqlLower.includes('applications')) {
-        if (sqlLower.includes('join students') && sqlLower.includes('join internships')) {
-          const companyId = params[0];
-          const result = applications
-            .filter(a => internships.find(i => i.id === a.internship_id)?.company_id === companyId)
-            .map(a => ({
-              ...a,
-              student_name: students.find(s => s.student_id === a.student_id)?.name || 'Unknown',
-              student_email: students.find(s => s.student_id === a.student_id)?.email || 'Unknown',
-              skill_required: internships.find(i => i.id === a.internship_id)?.skill_required || 'Unknown',
-              internship_location: internships.find(i => i.id === a.internship_id)?.location || 'Unknown'
-            }));
-          return [result];
-        }
-        if (sqlLower.includes('join internships') && sqlLower.includes('join companies')) {
-          const studentId = params[0];
-          const result = applications
-            .filter(a => a.student_id === studentId)
-            .map(a => ({
-              ...a,
-              skill_required: internships.find(i => i.id === a.internship_id)?.skill_required || 'Unknown',
-              stipend: internships.find(i => i.id === a.internship_id)?.stipend || 0,
-              location: internships.find(i => i.id === a.internship_id)?.location || 'Unknown',
-              duration: internships.find(i => i.id === a.internship_id)?.duration || 'Unknown',
-              company_name: companies.find(c => c.company_id === internships.find(i => i.id === a.internship_id)?.company_id)?.company_name || 'Unknown'
-            }));
-          return [result];
-        }
-        // Duplicate-check: SELECT id FROM applications WHERE student_id = ? AND internship_id = ?
-        if (sqlLower.includes('student_id') && sqlLower.includes('internship_id')) {
-          const studentId = params[0];
-          const internshipId = params[1];
-          const found = applications.filter(a => a.student_id === studentId && a.internship_id === internshipId);
-          return [found];
-        }
-        // SELECT * FROM applications WHERE student_id = ?
-        if (sqlLower.includes('student_id') && params.length === 1) {
-          return [applications.filter(a => a.student_id === params[0])];
-        }
-        return [applications];
       }
     }
     

@@ -167,7 +167,12 @@
         <div class="card">
           <div class="card-header">
             <h3><i class="fas fa-users"></i> Student Applications</h3>
-            <span class="card-badge" id="appCount">0 total</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="card-badge" id="appCount">0 total</span>
+              <button onclick="fetchApplications()" class="btn-sm" style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:13px;">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
           </div>
           <div class="card-body">
             <div id="applicationsGrid" class="internship-grid"></div>
