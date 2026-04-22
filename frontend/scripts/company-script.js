@@ -3,7 +3,7 @@
 // (Integrated with Backend API)
 // ============================================
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = '/api';
 
 // Retrieve token from login
 const token = localStorage.getItem('token');
