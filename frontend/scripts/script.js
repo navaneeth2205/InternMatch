@@ -9,8 +9,8 @@ const API_BASE = 'http://localhost:5001/api';
 const token = localStorage.getItem('token');
 const user = JSON.parse(localStorage.getItem('user'));
 
-if (!token || user?.role !== 'student') {
-  window.location.href = '../pages/student-login.html';
+if (!user || user?.role !== 'student') {
+  window.location.href = 'student-login.html';
 }
 
 // -------------------

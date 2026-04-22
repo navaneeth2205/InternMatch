@@ -72,7 +72,7 @@ async function handleStudentLogin(e) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       showToast('Login successful! Redirecting...');
-      setTimeout(() => window.location.href = '../pages/student.html', 1000);
+      setTimeout(() => window.location.href = 'student.html', 1000);
     } else {
       showToast(data.error || 'Login failed', 'error');
     }
@@ -80,7 +80,7 @@ async function handleStudentLogin(e) {
     // Fallback: allow login without backend for demo
     localStorage.setItem('user', JSON.stringify({ name: 'Student', email, role: 'student' }));
     showToast('Login successful! Redirecting...');
-    setTimeout(() => window.location.href = '../pages/student.html', 1000);
+    setTimeout(() => window.location.href = 'student.html', 1000);
   }
 
   return false;
@@ -115,13 +115,13 @@ async function handleStudentRegister(e) {
 
     if (res.ok) {
       showToast('Account created! Redirecting to login...');
-      setTimeout(() => window.location.href = '../pages/student-login.html', 1500);
+      setTimeout(() => window.location.href = 'student-login.html', 1500);
     } else {
       showToast(data.error || 'Registration failed', 'error');
     }
   } catch (err) {
     showToast('Account created! Redirecting to login...');
-    setTimeout(() => window.location.href = '../pages/student-login.html', 1500);
+    setTimeout(() => window.location.href = 'student-login.html', 1500);
   }
 
   return false;
@@ -154,14 +154,14 @@ async function handleCompanyLogin(e) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       showToast('Login successful! Redirecting...');
-      setTimeout(() => window.location.href = '../pages/company.html', 1000);
+      setTimeout(() => window.location.href = 'company.html', 1000);
     } else {
       showToast(data.error || 'Login failed', 'error');
     }
   } catch (err) {
     localStorage.setItem('user', JSON.stringify({ name: 'Company', email, role: 'company' }));
     showToast('Login successful! Redirecting...');
-    setTimeout(() => window.location.href = '../pages/company.html', 1000);
+    setTimeout(() => window.location.href = 'company.html', 1000);
   }
 
   return false;
@@ -196,13 +196,13 @@ async function handleCompanyRegister(e) {
 
     if (res.ok) {
       showToast('Account created! Redirecting to login...');
-      setTimeout(() => window.location.href = '../pages/company-login.html', 1500);
+      setTimeout(() => window.location.href = 'company-login.html', 1500);
     } else {
       showToast(data.error || 'Registration failed', 'error');
     }
   } catch (err) {
     showToast('Account created! Redirecting to login...');
-    setTimeout(() => window.location.href = '../pages/company-login.html', 1500);
+    setTimeout(() => window.location.href = 'company-login.html', 1500);
   }
 
   return false;

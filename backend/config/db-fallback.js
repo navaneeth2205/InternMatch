@@ -49,7 +49,8 @@ nextIds = { student: 3, company: 3, internship: 4, application: 3, skill: 4 };
 // Mock pool object with query method
 const mockPool = {
   query: async (sql, params = []) => {
-    console.log('🔧 Fallback DB Query:', sql, params);
+    console.log('?? Fallback DB Query:', sql, params);
+    console.log('?? SQL Lowercase:', sql.toLowerCase());
     
     // Parse SQL to determine operation
     const sqlLower = sql.toLowerCase();
@@ -101,6 +102,17 @@ const mockPool = {
               company_name: companies.find(c => c.company_id === internships.find(i => i.id === a.internship_id)?.company_id)?.company_name || 'Unknown'
             }));
           return [result];
+        }
+        // Duplicate-check: SELECT id FROM applications WHERE student_id = ? AND internship_id = ?
+        if (sqlLower.includes('student_id') && sqlLower.includes('internship_id')) {
+          const studentId = params[0];
+          const internshipId = params[1];
+          const found = applications.filter(a => a.student_id === studentId && a.internship_id === internshipId);
+          return [found];
+        }
+        // SELECT * FROM applications WHERE student_id = ?
+        if (sqlLower.includes('student_id') && params.length === 1) {
+          return [applications.filter(a => a.student_id === params[0])];
         }
         return [applications];
       }

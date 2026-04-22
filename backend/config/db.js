@@ -17,18 +17,31 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+let currentDb = pool;
+
 // Test connection
 pool.getConnection()
   .then(conn => {
     console.log('✅ MySQL connected successfully');
     conn.release();
-    module.exports = pool;
   })
   .catch(err => {
     console.error('❌ MySQL connection failed:', err.message);
     console.log('🔄 Switching to in-memory database fallback...');
-    module.exports = require('./db-fallback');
+    currentDb = require('./db-fallback');
   });
 
-// Export pool initially (will be replaced by fallback if connection fails)
-module.exports = pool;
+// Export a wrapper that dynamically uses currentDb
+module.exports = {
+  query: (...args) => currentDb.query(...args),
+  getConnection: (...args) => {
+    if (currentDb.getConnection) {
+      return currentDb.getConnection(...args);
+    }
+    // Fallback stub for getConnection
+    return Promise.resolve({
+      release: () => {},
+      query: (...qArgs) => currentDb.query(...qArgs)
+    });
+  }
+};

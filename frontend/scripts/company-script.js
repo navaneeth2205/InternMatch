@@ -9,8 +9,8 @@ const API_BASE = 'http://localhost:5001/api';
 const token = localStorage.getItem('token');
 const user = JSON.parse(localStorage.getItem('user'));
 
-if (!token || user?.role !== 'company') {
-  window.location.href = '../pages/company-login.html';
+if (!user || user?.role !== 'company') {
+  window.location.href = 'company-login.html';
 }
 
 let companyInternships = [];
@@ -88,8 +88,8 @@ async function fetchInternships() {
     });
     if (res.ok) {
       let data = await res.json();
-      // Filter only this company's internships (backend returns all, but we can filter by company name since we don't have a specific endpoint for company's own internships yet)
-      companyInternships = data.filter(i => i.company_name === user.name || i.company_name); 
+      // Filter only this company's internships by matching company_name to logged-in company
+      companyInternships = data.filter(i => i.company_name === user.name);
       displayManagedInternships();
       updateStats();
     }
@@ -290,7 +290,7 @@ document.querySelector('.sidebar-logout').addEventListener('click', (e) => {
   e.preventDefault();
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '../pages/index.html';
+  window.location.href = 'index.html';
 });
 
 // INIT
