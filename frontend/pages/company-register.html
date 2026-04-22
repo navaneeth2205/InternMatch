@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Register | InternMatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../styles/auth.css">
+</head>
+<body>
+
+<div class="auth-topbar">
+  <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <div class="logo-icon"><i class="fas fa-rocket"></i></div>
+    <span class="logo-text">InternMatch</span>
+  </a>
+</div>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2>Register Company 🏢</h2>
+    <p class="auth-subtitle">Create your company account on InternMatch</p>
+
+    <form id="companyRegForm" onsubmit="return handleCompanyRegister(event)">
+      <div class="form-group" id="compNameGroup">
+        <label>Company Name</label>
+        <div class="input-field">
+          <i class="fas fa-building"></i>
+          <input type="text" id="regCompanyName" placeholder="Acme Corp" required>
+        </div>
+        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Company name is required</span></div>
+      </div>
+
+      <div class="form-group" id="emailGroup">
+        <label>Email Address</label>
+        <div class="input-field">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="regEmail" placeholder="hr@company.com" required>
+        </div>
+        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Please enter a valid email</span></div>
+      </div>
+
+      <div class="form-group" id="passwordGroup">
+        <label>Password</label>
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="regPassword" placeholder="Create a password" required>
+        </div>
+        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Minimum 6 characters</span></div>
+      </div>
+
+      <div class="form-group" id="confirmGroup">
+        <label>Confirm Password</label>
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="regConfirm" placeholder="Confirm your password" required>
+        </div>
+        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Passwords don't match</span></div>
+      </div>
+
+      <button type="submit" class="auth-btn auth-btn-primary">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <button class="auth-btn auth-btn-google" onclick="googleSignIn()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Sign up with Google
+    </button>
+
+    <div class="auth-links">
+      Already have an account? <a href="company-login.html">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<div class="auth-footer">
+  <p>&copy; 2026 InternMatch | DBMS Project</p>
+</div>
+
+<script src="../scripts/auth.js"></script>
+</body>
+</html>

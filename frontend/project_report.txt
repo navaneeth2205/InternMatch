@@ -1,0 +1,128 @@
+================================================================================
+                        INTERNMATCH - DETAILED PROJECT REPORT
+================================================================================
+
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+InternMatch is a modern, full-stack web application designed to connect students 
+with companies for internship opportunities. The platform acts as a bridge where 
+students can showcase their skills and companies can post internships. A smart 
+matching system automatically filters internships based on a student's skill set, 
+allowing for a seamless "One-Click Apply" experience.
+
+
+2. TECHNOLOGY STACK
+--------------------------------------------------------------------------------
+The project is built using a custom lightweight full-stack architecture without 
+heavy frontend frameworks to ensure fast loading times and deep understanding 
+of web fundamentals.
+
+Frontend (Client-Side):
+- HTML5: Semantic structure and accessibility.
+- CSS3: Custom design system using CSS Variables, Flexbox, Grid, and modern 
+  UI techniques like glassmorphism and gradient accents. No external CSS 
+  frameworks (like Bootstrap or Tailwind) were used.
+- JavaScript (Vanilla): DOM manipulation, client-side routing logic (section 
+  toggling), local storage management, and async API calls (Fetch API).
+- Assets: Google Fonts (Inter font family) and FontAwesome 6.5 (Icons).
+
+Backend (Server-Side):
+- Node.js: JavaScript runtime environment.
+- Express.js: Fast, unopinionated web framework for Node.js used for building 
+  the RESTful API.
+- JSON Web Tokens (JWT): Used for secure, stateless user authentication and 
+  session management.
+- bcryptjs: Used for cryptographic password hashing before storing in the database.
+- cors & dotenv: Middleware for Cross-Origin requests and environment variable 
+  management.
+
+Database:
+- MySQL: Relational database management system.
+- mysql2: Node.js driver for MySQL with Promise support for async/await queries.
+
+
+3. KEY FEATURES
+--------------------------------------------------------------------------------
+Student Portal:
+- Secure Registration and Login.
+- Interactive Dashboard with dark mode support.
+- Skill Management: Students can add their technical skills to their profile.
+- Smart Matching: The dashboard dynamically filters active internships that match 
+  the student's selected skills.
+- Live Search: Search bar to filter internships by company, skill, or location.
+- Application Tracking: Real-time tracking of application status (Pending, 
+  Selected, Rejected).
+
+Company Portal:
+- Secure Company Registration and Login.
+- Analytics Dashboard: View statistics on total postings, active internships, 
+  and total applications received.
+- Post Internships: Create new internship listings specifying required skills, 
+  stipend, location, and duration.
+- Manage Listings: Delete closed or incorrect internship postings.
+- Application Review: View student applications (including their skills and 
+  email) and accept or reject them with a single click.
+
+General Features:
+- Modern Landing Page with animated counters, feature cards, and responsive design.
+- Toast Notification System for seamless user feedback without intrusive alerts.
+- Role-based Access Control (RBAC) ensuring students cannot access company 
+  routes and vice versa.
+
+
+4. DATABASE SCHEMA (MySQL)
+--------------------------------------------------------------------------------
+The database is fully normalized and utilizes foreign keys with cascading deletes.
+
+1. users: Stores credentials (id, name, email, hashed_password, role).
+2. student_profiles: Links to users (id, user_id, interest).
+3. student_skills: Links to student_profiles (id, student_id, skill_name).
+4. companies: Links to users (id, user_id, company_name, industry, location, etc).
+5. internships: Links to companies (id, company_id, skill_required, stipend, 
+   location, duration, description, status).
+6. applications: Links students to internships (id, student_id, internship_id, 
+   status, applied_at).
+
+
+5. RESTful API ENDPOINTS
+--------------------------------------------------------------------------------
+Auth API:
+- POST /api/register : Registers a new user (student or company).
+- POST /api/login    : Authenticates a user and returns a JWT token.
+
+Internship API:
+- GET /api/internships    : Fetches all active internships.
+- POST /api/internships   : Creates a new internship (Company only).
+- PUT /api/internships/:id    : Updates an internship (Company only).
+- DELETE /api/internships/:id : Deletes an internship (Company only).
+
+Application API:
+- POST /api/applications/apply : Applies to an internship (Student only).
+- GET /api/applications/my     : Gets a student's own applications (Student only).
+- GET /api/applications        : Gets applications received by a company (Company only).
+- PUT /api/applications/:id    : Accepts/Rejects an application (Company only).
+
+
+6. HOW TO RUN THE PROJECT
+--------------------------------------------------------------------------------
+1. Prerequisites:
+   - Node.js installed.
+   - MySQL installed and running.
+
+2. Database Setup:
+   - Create a database named `internmatch`.
+   - Execute the `backend/schema.sql` file in your MySQL environment.
+   - Update `backend/.env` with your MySQL credentials.
+
+3. Start Backend:
+   - Open a terminal in the `backend` directory.
+   - Run `npm install` to install dependencies.
+   - Run `node server.js` to start the Express server (runs on port 5000).
+
+4. View Frontend:
+   - Open `index.html` in any modern web browser.
+   - Or access it via the local server at http://localhost:5000/index.html
+
+================================================================================
+                        END OF REPORT
+================================================================================

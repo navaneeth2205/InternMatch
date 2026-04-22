@@ -1,0 +1,91 @@
+# =========================
+# 🔐 ENV & SECRETS
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# 🐍 PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+ENV/
+env/
+.venv/
+
+# Python build files
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# ⚙️ FASTAPI / BACKEND
+# =========================
+*.log
+*.sqlite3
+*.db
+
+# Uvicorn / Gunicorn logs
+*.log
+logs/
+
+# =========================
+# 🗄️ DATABASE
+# =========================
+*.sql
+*.dump
+*.db
+*.sqlite3
+
+# =========================
+# 🌐 FRONTEND
+# =========================
+node_modules/
+dist/
+build/
+
+# Package files (optional keep/remove based on need)
+package-lock.json
+yarn.lock
+
+# =========================
+# 🧪 TEST / CACHE
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# 💻 IDE FILES
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# 🖥️ OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# 🔑 SECURITY
+# =========================
+*.pem
+*.key
+*.crt
+
+# =========================
+# 📦 MISC
+# =========================
+*.bak
+*.tmp
+*.temp
