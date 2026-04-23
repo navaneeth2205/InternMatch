@@ -268,12 +268,12 @@ function showInternships() {
   if (countEl) countEl.textContent = matched.length + " found";
 
   matched.forEach(i => {
-    // Check if applied using actual application records
-    let alreadyApplied = applications.some(a => a.internship_id === i.id || a.company_name === i.company_name);
+    // Check if applied using actual application records based exclusively on internship_id
+    let alreadyApplied = applications.some(a => a.internship_id === i.id);
     
     let buttonHTML = alreadyApplied
       ? `<button class="btn-primary" disabled style="opacity:0.7;cursor:not-allowed;"><i class="fas fa-check-circle"></i> Applied Successfully</button>`
-      : `<button class="btn-primary" onclick="applyToInternship(${i.id}, '${i.company_name}')"><i class="fas fa-paper-plane"></i> Apply Now</button>`;
+      : `<button class="btn-primary" onclick="applyToInternship(event, ${i.id}, '${i.company_name}')"><i class="fas fa-paper-plane"></i> Apply Now</button>`;
 
     let card = document.createElement("div");
     card.className = "internship-card";
@@ -295,7 +295,14 @@ document.getElementById('searchBar')?.addEventListener('keyup', showInternships)
 // -------------------
 // API: APPLICATION SYSTEM
 // -------------------
-async function applyToInternship(internshipId, companyName) {
+async function applyToInternship(event, internshipId, companyName) {
+  // Prevent double clicks instantly
+  let btn = event.currentTarget;
+  let originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Applying...`;
+  btn.style.opacity = '0.7';
+
   try {
     let res = await fetch(`${API_BASE}/applications/apply`, {
       method: 'POST',
@@ -307,15 +314,67 @@ async function applyToInternship(internshipId, companyName) {
     });
     
     if (res.ok) {
-      showToast("Applied Successfully! 🎉", "Your application to " + companyName + " has been submitted.");
-      fetchApplications(); // Refresh applications, which will update the buttons
+      showSuccessPopup(companyName);
+      await fetchApplications(); // Ensure applications array updates before re-enabling UI
     } else {
       let data = await res.json();
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+      btn.style.opacity = '1';
       showToast("Notice", data.error || "Could not apply", "error");
     }
   } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+    btn.style.opacity = '1';
     showToast("Error", "Server error while applying.", "error");
   }
+}
+
+// -------------------
+// AWESOME SUCCESS POPUP
+// -------------------
+function showSuccessPopup(companyName) {
+  let overlay = document.createElement('div');
+  overlay.className = 'success-popup-overlay';
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; opacity: 0; transition: opacity 0.3s ease;
+  `;
+
+  let popup = document.createElement('div');
+  popup.style.cssText = `
+    background: var(--card-bg, #fff); padding: 40px; border-radius: 16px;
+    text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 90%; width: 400px; border: 1px solid var(--border-color, #e5e7eb);
+  `;
+
+  popup.innerHTML = `
+    <div style="width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+      <i class="fas fa-check" style="color: white; font-size: 40px;"></i>
+    </div>
+    <h2 style="margin: 0 0 10px; color: var(--text-dark, #111827); font-size: 24px;">Application Sent!</h2>
+    <p style="margin: 0 0 25px; color: var(--text-muted, #6b7280); font-size: 16px; line-height: 1.5;">
+      You have successfully applied to <b>${companyName}</b>. They will review your application soon. Good luck! 🎉
+    </p>
+    <button onclick="this.closest('.success-popup-overlay').remove()" style="
+      background: var(--primary, #3b82f6); color: white; border: none; padding: 12px 30px;
+      border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;
+      width: 100%; transition: opacity 0.2s;
+    ">Awesome!</button>
+  `;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  // Trigger animations
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    popup.style.transform = 'scale(1)';
+  });
 }
 
 async function fetchApplications() {
@@ -372,9 +431,36 @@ function displayApplications() {
       <div class="status-badge ${statusClass}">
         <i class="fas ${statusIcon}"></i> ${a.status}
       </div>
+      ${a.status === 'Pending' ? `<button onclick="withdrawApplication(${a.id})" class="btn-sm" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 12px;margin-top:10px;cursor:pointer;font-size:13px;width:100%;"><i class="fas fa-trash"></i> Withdraw</button>` : ''}
     `;
     div.appendChild(card);
   });
+}
+
+// -------------------
+// WITHDRAW APPLICATION
+// -------------------
+async function withdrawApplication(applicationId) {
+  if (!confirm('Are you sure you want to withdraw this application?')) return;
+  
+  try {
+    let res = await fetch(`${API_BASE}/applications/withdraw/${applicationId}`, {
+      method: 'DELETE',
+      headers: { 
+        'Authorization': `Bearer ${token}` 
+      }
+    });
+    
+    if (res.ok) {
+      showToast("Withdrawn", "Your application has been successfully withdrawn.");
+      fetchApplications(); // Refresh applications, which will update buttons in the internships list
+    } else {
+      let data = await res.json();
+      showToast("Notice", data.error || "Could not withdraw application", "error");
+    }
+  } catch (err) {
+    showToast("Error", "Server error while withdrawing.", "error");
+  }
 }
 
 // -------------------

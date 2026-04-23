@@ -29,6 +29,21 @@ db.exec(`
     year_of_study INTEGER
   );
 
+  CREATE TABLE IF NOT EXISTS Skills (
+    skill_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    skill_name  TEXT NOT NULL,
+    skill_level TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS Student_Skills (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id  INTEGER,
+    skill_id    INTEGER,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (skill_id)   REFERENCES Skills(skill_id) ON DELETE CASCADE,
+    UNIQUE(student_id, skill_id)
+  );
+
   CREATE TABLE IF NOT EXISTS Companies (
     company_id   INTEGER PRIMARY KEY AUTOINCREMENT,
     company_name TEXT NOT NULL,
@@ -78,6 +93,14 @@ if (studentCount === 0) {
     .run('TechCorp', 'hr@techcorp.com', samplePassword, 'San Francisco', 'Software');
   db.prepare(`INSERT INTO Companies (company_name, email, password, location, industry) VALUES (?,?,?,?,?)`)
     .run('DataWorks', 'contact@dataworks.com', samplePassword, 'New York', 'Data Analytics');
+
+  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('JavaScript', 'Intermediate');
+  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('Python', 'Advanced');
+  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('SQL', 'Beginner');
+
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(1, 1);
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(1, 2);
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(2, 3);
 
   db.prepare(`INSERT INTO Internships (company_id, skill_required, duration, stipend, location, description) VALUES (?,?,?,?,?,?)`)
     .run(1, 'JavaScript', '3 Months', 5000, 'Remote', 'Frontend dev internship');

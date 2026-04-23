@@ -107,4 +107,27 @@ async function getMyApplications(req, res) {
   }
 }
 
-module.exports = { applyToInternship, getApplications, updateApplicationStatus, getMyApplications };
+// DELETE /api/applications/withdraw/:id — Student withdraws their own application
+async function withdrawApplication(req, res) {
+  try {
+    const studentId = req.user.id;
+    const { id } = req.params;
+
+    // Delete application ONLY if it belongs to the logged-in student
+    const [result] = await pool.query(
+      'DELETE FROM applications WHERE id = ? AND student_id = ?',
+      [id, studentId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Application not found or you do not have permission to withdraw it.' });
+    }
+
+    res.json({ message: 'Application withdrawn successfully.' });
+  } catch (err) {
+    console.error('Withdraw application error:', err);
+    res.status(500).json({ error: 'Failed to withdraw application.' });
+  }
+}
+
+module.exports = { applyToInternship, getApplications, updateApplicationStatus, getMyApplications, withdrawApplication };
