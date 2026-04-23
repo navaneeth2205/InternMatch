@@ -23,9 +23,14 @@ const sampleData = {
     { company_id: 2, company_name: 'DataWorks', email: 'contact@dataworks.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', location: 'New York', industry: 'Data Analytics' }
   ],
   skills: [
-    { skill_id: 1, skill_name: 'JavaScript', skill_level: 'Intermediate' },
-    { skill_id: 2, skill_name: 'Python', skill_level: 'Advanced' },
-    { skill_id: 3, skill_name: 'SQL', skill_level: 'Beginner' }
+    { skill_id: 1, skill_name: 'JavaScript' },
+    { skill_id: 2, skill_name: 'Python' },
+    { skill_id: 3, skill_name: 'SQL' }
+  ],
+  studentSkills: [
+    { student_id: 1, skill_id: 1, skill_level: 'Intermediate' },
+    { student_id: 1, skill_id: 2, skill_level: 'Advanced' },
+    { student_id: 2, skill_id: 3, skill_level: 'Beginner' }
   ],
   internships: [
     { id: 1, company_id: 1, skill_required: 'JavaScript', duration: '3 Months', stipend: 5000, location: 'Remote', description: 'Frontend dev internship', status: 'Active', created_at: new Date() },
@@ -42,6 +47,7 @@ const sampleData = {
 students = sampleData.students;
 companies = sampleData.companies;
 skills = sampleData.skills;
+studentSkills = sampleData.studentSkills;
 internships = sampleData.internships;
 applications = sampleData.applications;
 nextIds = { student: 3, company: 3, internship: 4, application: 3, skill: 4 };

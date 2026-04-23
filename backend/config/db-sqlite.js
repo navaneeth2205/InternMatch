@@ -31,14 +31,14 @@ db.exec(`
 
   CREATE TABLE IF NOT EXISTS Skills (
     skill_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    skill_name  TEXT NOT NULL,
-    skill_level TEXT
+    skill_name  TEXT UNIQUE NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS Student_Skills (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id  INTEGER,
     skill_id    INTEGER,
+    skill_level TEXT,
     FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id)   REFERENCES Skills(skill_id) ON DELETE CASCADE,
     UNIQUE(student_id, skill_id)
@@ -63,7 +63,8 @@ db.exec(`
     description  TEXT,
     status       TEXT DEFAULT 'Active',
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (company_id) REFERENCES Companies(company_id) ON DELETE CASCADE
+    FOREIGN KEY (company_id) REFERENCES Companies(company_id) ON DELETE CASCADE,
+    FOREIGN KEY (skill_required) REFERENCES Skills(skill_name) ON DELETE SET NULL
   );
 
   CREATE TABLE IF NOT EXISTS Applications (
@@ -94,13 +95,13 @@ if (studentCount === 0) {
   db.prepare(`INSERT INTO Companies (company_name, email, password, location, industry) VALUES (?,?,?,?,?)`)
     .run('DataWorks', 'contact@dataworks.com', samplePassword, 'New York', 'Data Analytics');
 
-  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('JavaScript', 'Intermediate');
-  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('Python', 'Advanced');
-  db.prepare(`INSERT INTO Skills (skill_name, skill_level) VALUES (?,?)`).run('SQL', 'Beginner');
+  db.prepare(`INSERT INTO Skills (skill_name) VALUES (?)`).run('JavaScript');
+  db.prepare(`INSERT INTO Skills (skill_name) VALUES (?)`).run('Python');
+  db.prepare(`INSERT INTO Skills (skill_name) VALUES (?)`).run('SQL');
 
-  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(1, 1);
-  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(1, 2);
-  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id) VALUES (?,?)`).run(2, 3);
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id, skill_level) VALUES (?,?,?)`).run(1, 1, 'Intermediate');
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id, skill_level) VALUES (?,?,?)`).run(1, 2, 'Advanced');
+  db.prepare(`INSERT INTO Student_Skills (student_id, skill_id, skill_level) VALUES (?,?,?)`).run(2, 3, 'Beginner');
 
   db.prepare(`INSERT INTO Internships (company_id, skill_required, duration, stipend, location, description) VALUES (?,?,?,?,?,?)`)
     .run(1, 'JavaScript', '3 Months', 5000, 'Remote', 'Frontend dev internship');
