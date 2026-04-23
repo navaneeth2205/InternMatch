@@ -90,7 +90,7 @@ async function getMyApplications(req, res) {
     const studentId = userId;
 
     const [rows] = await pool.query(`
-      SELECT a.id, a.status, a.applied_at,
+      SELECT a.id, a.internship_id, a.status, a.applied_at,
              i.skill_required, i.stipend, i.location, i.duration,
              c.company_name
       FROM applications a
