@@ -44,9 +44,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 InternMatch Server running on http://localhost:${PORT}`);
-  console.log(`📡 API available at http://localhost:${PORT}/api`);
-  console.log(`🌐 Frontend at http://localhost:${PORT}/frontend/pages/index.html\n`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 InternMatch Server running on http://localhost:${PORT}`);
+    console.log(`📡 API available at http://localhost:${PORT}/api`);
+    console.log(`🌐 Frontend at http://localhost:${PORT}/frontend/pages/index.html\n`);
+  });
+}
+
+// Export for Vercel
+module.exports = app;
 
