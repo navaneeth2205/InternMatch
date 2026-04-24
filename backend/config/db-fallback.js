@@ -1,6 +1,7 @@
 // ============================================
 // INTERNMATCH — DATABASE FALLBACK CONFIG
 // In-memory storage for demo purposes (no MySQL required)
+// Uses first_name + last_name for students
 // ============================================
 
 // In-memory storage
@@ -15,8 +16,8 @@ let nextIds = { student: 1, company: 1, internship: 1, application: 1, skill: 1 
 // Sample data
 const sampleData = {
   students: [
-    { student_id: 1, name: 'Alice Smith', email: 'alice@example.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', phone: '1234567890', department: 'Computer Science', year_of_study: 3 },
-    { student_id: 2, name: 'Bob Jones', email: 'bob@example.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', phone: '0987654321', department: 'Information Technology', year_of_study: 2 }
+    { student_id: 1, first_name: 'Alice', last_name: 'Smith', email: 'alice@example.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', phone: '1234567890', department: 'Computer Science', year_of_study: 3 },
+    { student_id: 2, first_name: 'Bob', last_name: 'Jones', email: 'bob@example.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', phone: '0987654321', department: 'Information Technology', year_of_study: 2 }
   ],
   companies: [
     { company_id: 1, company_name: 'TechCorp', email: 'hr@techcorp.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', location: 'San Francisco', industry: 'Software' },
@@ -55,8 +56,7 @@ nextIds = { student: 3, company: 3, internship: 4, application: 3, skill: 4 };
 // Mock pool object with query method
 const mockPool = {
   query: async (sql, params = []) => {
-    console.log('?? Fallback DB Query:', sql, params);
-    console.log('?? SQL Lowercase:', sql.toLowerCase());
+    console.log('📦 Fallback DB Query:', sql, params);
     
     // Parse SQL to determine operation
     const sqlLower = sql.toLowerCase();
@@ -71,7 +71,10 @@ const mockPool = {
             .filter(a => Number(internships.find(i => Number(i.id) === Number(a.internship_id))?.company_id) === companyId)
             .map(a => ({
               ...a,
-              student_name: students.find(s => Number(s.student_id) === Number(a.student_id))?.name || 'Unknown',
+              student_name: (() => {
+                const s = students.find(s => Number(s.student_id) === Number(a.student_id));
+                return s ? `${s.first_name} ${s.last_name}` : 'Unknown';
+              })(),
               student_email: students.find(s => Number(s.student_id) === Number(a.student_id))?.email || 'Unknown',
               skill_required: internships.find(i => Number(i.id) === Number(a.internship_id))?.skill_required || 'Unknown',
               internship_location: internships.find(i => Number(i.id) === Number(a.internship_id))?.location || 'Unknown'
@@ -132,9 +135,10 @@ const mockPool = {
       if (sqlLower.includes('students')) {
         const newStudent = {
           student_id: nextIds.student++,
-          name: params[0],
-          email: params[1],
-          password: params[2]
+          first_name: params[0],
+          last_name: params[1],
+          email: params[2],
+          password: params[3]
         };
         students.push(newStudent);
         return [{ insertId: newStudent.student_id }];
@@ -213,6 +217,16 @@ const mockPool = {
           internships.splice(index, 1);
         }
         return [{ affectedRows: 1 }];
+      }
+      if (sqlLower.includes('applications')) {
+        const id = Number(params[0]);
+        const studentId = Number(params[1]);
+        const index = applications.findIndex(a => a.id === id && Number(a.student_id) === studentId);
+        if (index !== -1) {
+          applications.splice(index, 1);
+          return [{ affectedRows: 1 }];
+        }
+        return [{ affectedRows: 0 }];
       }
     }
     

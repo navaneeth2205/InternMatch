@@ -25,13 +25,23 @@
     <p class="auth-subtitle">Join InternMatch as a student</p>
 
     <form id="registerForm" onsubmit="return handleStudentRegister(event)">
-      <div class="form-group" id="nameGroup">
-        <label>Full Name</label>
-        <div class="input-field">
-          <i class="fas fa-user"></i>
-          <input type="text" id="regName" placeholder="John Doe" required>
+      <div style="display:flex;gap:12px;">
+        <div class="form-group" id="firstNameGroup" style="flex:1;">
+          <label>First Name</label>
+          <div class="input-field">
+            <i class="fas fa-user"></i>
+            <input type="text" id="regFirstName" placeholder="John" required>
+          </div>
+          <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>First name is required</span></div>
         </div>
-        <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Name is required</span></div>
+        <div class="form-group" id="lastNameGroup" style="flex:1;">
+          <label>Last Name</label>
+          <div class="input-field">
+            <i class="fas fa-user"></i>
+            <input type="text" id="regLastName" placeholder="Doe" required>
+          </div>
+          <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <span>Last name is required</span></div>
+        </div>
       </div>
 
       <div class="form-group" id="emailGroup">

@@ -48,7 +48,7 @@ async function getApplications(req, res) {
 
     const [rows] = await pool.query(`
       SELECT a.id, a.status, a.applied_at,
-             u.name AS student_name, u.email AS student_email,
+             CONCAT(u.first_name, ' ', u.last_name) AS student_name, u.email AS student_email,
              i.skill_required, i.stipend, i.location AS internship_location
       FROM applications a
       JOIN Students u ON a.student_id = u.student_id

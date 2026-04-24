@@ -1,6 +1,7 @@
 // ============================================
 // INTERNMATCH — AUTH JS
 // Form validation + API calls
+// Uses firstName + lastName for students
 // ============================================
 
 const API_BASE = '/api';
@@ -93,13 +94,15 @@ async function handleStudentRegister(e) {
   e.preventDefault();
   clearErrors();
 
-  let name = document.getElementById('regName').value.trim();
+  let firstName = document.getElementById('regFirstName').value.trim();
+  let lastName = document.getElementById('regLastName').value.trim();
   let email = document.getElementById('regEmail').value.trim();
   let password = document.getElementById('regPassword').value;
   let confirm = document.getElementById('regConfirm').value;
 
   let valid = true;
-  if (!name) { setError('nameGroup', 'Name is required'); valid = false; }
+  if (!firstName) { setError('firstNameGroup', 'First name is required'); valid = false; }
+  if (!lastName) { setError('lastNameGroup', 'Last name is required'); valid = false; }
   if (!isValidEmail(email)) { setError('emailGroup', 'Please enter a valid email'); valid = false; }
   if (password.length < 6) { setError('passwordGroup', 'Minimum 6 characters'); valid = false; }
   if (password !== confirm) { setError('confirmGroup', "Passwords don't match"); valid = false; }
@@ -109,7 +112,7 @@ async function handleStudentRegister(e) {
     let res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role: 'student' })
+      body: JSON.stringify({ firstName, lastName, email, password, role: 'student' })
     });
     let data = await res.json();
 
@@ -190,7 +193,7 @@ async function handleCompanyRegister(e) {
     let res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: companyName, email, password, role: 'company', companyName })
+      body: JSON.stringify({ email, password, role: 'company', companyName })
     });
     let data = await res.json();
 

@@ -1,6 +1,6 @@
 // ============================================
 // AUTH CONTROLLER
-// Register + Login
+// Register + Login (first_name + last_name)
 // ============================================
 
 const bcrypt = require('bcryptjs');
@@ -10,7 +10,7 @@ const pool = require('../config/db');
 // POST /api/register
 async function register(req, res) {
   try {
-    const { name, email, password, role, companyName } = req.body;
+    const { firstName, lastName, email, password, role, companyName } = req.body;
 
     // Validate
     if (!email || !password || !role) {
@@ -35,15 +35,18 @@ async function register(req, res) {
     let userId;
     // Insert user
     if (role === 'student') {
+       if (!firstName || !lastName) {
+         return res.status(400).json({ error: 'First name and last name are required.' });
+       }
        const [result] = await pool.query(
-         'INSERT INTO Students (name, email, password) VALUES (?, ?, ?)',
-         [name, email, hashedPassword]
+         'INSERT INTO Students (first_name, last_name, email, password) VALUES (?, ?, ?, ?)',
+         [firstName, lastName, email, hashedPassword]
        );
        userId = result.insertId;
     } else {
        const [result] = await pool.query(
          'INSERT INTO Companies (company_name, email, password) VALUES (?, ?, ?)',
-         [companyName || name, email, hashedPassword]
+         [companyName, email, hashedPassword]
        );
        userId = result.insertId;
     }
@@ -84,7 +87,9 @@ async function login(req, res) {
     // Standardize user object for JWT
     const jwtUser = {
       id: role === 'student' ? user.student_id : user.company_id,
-      name: role === 'student' ? user.name : user.company_name,
+      firstName: role === 'student' ? user.first_name : null,
+      lastName: role === 'student' ? user.last_name : null,
+      name: role === 'student' ? `${user.first_name} ${user.last_name}` : user.company_name,
       email: user.email,
       role: role
     };

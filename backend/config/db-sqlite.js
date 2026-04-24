@@ -2,6 +2,8 @@
 // INTERNMATCH — SQLite PERSISTENT DATABASE
 // File-based DB - survives server restarts!
 // Data stored at: backend/internmatch.db
+// NOTE: This file is kept for local development only.
+// Production uses MySQL via db.js
 // ============================================
 
 const Database = require('better-sqlite3');
@@ -17,11 +19,13 @@ db.pragma('foreign_keys = ON');
 
 // ============================================
 // CREATE TABLES (if not already there)
+// Uses first_name + last_name instead of name
 // ============================================
 db.exec(`
   CREATE TABLE IF NOT EXISTS Students (
     student_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name       TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name  TEXT NOT NULL,
     email      TEXT UNIQUE NOT NULL,
     password   TEXT NOT NULL,
     phone      TEXT,
@@ -85,10 +89,10 @@ const studentCount = db.prepare('SELECT COUNT(*) as c FROM Students').get().c;
 if (studentCount === 0) {
   const samplePassword = '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W'; // = "password123"
 
-  db.prepare(`INSERT INTO Students (name, email, password, phone, department, year_of_study) VALUES (?,?,?,?,?,?)`)
-    .run('Alice Smith', 'alice@example.com', samplePassword, '1234567890', 'Computer Science', 3);
-  db.prepare(`INSERT INTO Students (name, email, password, phone, department, year_of_study) VALUES (?,?,?,?,?,?)`)
-    .run('Bob Jones', 'bob@example.com', samplePassword, '0987654321', 'Information Technology', 2);
+  db.prepare(`INSERT INTO Students (first_name, last_name, email, password, phone, department, year_of_study) VALUES (?,?,?,?,?,?,?)`)
+    .run('Alice', 'Smith', 'alice@example.com', samplePassword, '1234567890', 'Computer Science', 3);
+  db.prepare(`INSERT INTO Students (first_name, last_name, email, password, phone, department, year_of_study) VALUES (?,?,?,?,?,?,?)`)
+    .run('Bob', 'Jones', 'bob@example.com', samplePassword, '0987654321', 'Information Technology', 2);
 
   db.prepare(`INSERT INTO Companies (company_name, email, password, location, industry) VALUES (?,?,?,?,?)`)
     .run('TechCorp', 'hr@techcorp.com', samplePassword, 'San Francisco', 'Software');
