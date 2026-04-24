@@ -44,7 +44,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // Start server
-if (process.env.NODE_ENV !== 'production') {
+// Render needs app.listen to be called, Vercel serverless doesn't.
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`\n🚀 InternMatch Server running on http://localhost:${PORT}`);
     console.log(`📡 API available at http://localhost:${PORT}/api`);
