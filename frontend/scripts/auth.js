@@ -75,7 +75,7 @@ async function handleStudentLogin(e) {
       showToast('Login successful! Redirecting...');
       setTimeout(() => window.location.href = 'student.html', 1000);
     } else {
-      showToast(data.error || 'Login failed', 'error');
+      showToast(data.details ? `Error: ${data.details}` : (data.error || 'Login failed'), 'error');
     }
   } catch (err) {
     // Fallback: allow login without backend for demo
