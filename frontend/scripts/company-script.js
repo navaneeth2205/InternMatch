@@ -13,6 +13,12 @@ if (!user || user?.role !== 'company') {
   window.location.href = 'company-login.html';
 }
 
+if (!user?.id) {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'company-login.html';
+}
+
 let companyInternships = [];
 let companyApplications = [];
 
@@ -78,6 +84,27 @@ function updateStats() {
   if (el('statSelected')) el('statSelected').textContent = companyApplications.filter(a => a.status === 'Selected').length;
 }
 
+async function fetchCompanyProfile() {
+  try {
+    let res = await fetch(`${API_BASE}/company/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!res.ok) return;
+
+    let data = await res.json();
+    const nameEl = document.getElementById('profileName');
+    const industryEl = document.getElementById('profileIndustry');
+    const locationEl = document.getElementById('profileLocation');
+
+    if (nameEl) nameEl.value = data.company_name || '';
+    if (industryEl) industryEl.value = data.industry || '';
+    if (locationEl) locationEl.value = data.location || '';
+  } catch (err) {
+    console.error('Failed to load company profile:', err);
+  }
+}
+
 // -------------------
 // API: FETCH INTERNSHIPS
 // -------------------
@@ -88,8 +115,8 @@ async function fetchInternships() {
     });
     if (res.ok) {
       let data = await res.json();
-      // Filter only this company's internships by matching company_name to logged-in company
-      companyInternships = data.filter(i => i.company_name === user.name);
+      // Filter by company_id so a renamed company still sees its own internships
+      companyInternships = data.filter(i => Number(i.company_id) === Number(user.id));
       displayManagedInternships();
       updateStats();
     }
@@ -278,10 +305,43 @@ async function updateAppStatus(id, newStatus) {
   }
 }
 
-// Profile Placeholder (localStorage for now)
+// Profile saved to MySQL
 function saveCompanyProfile(e) {
   e.preventDefault();
-  showToast('Profile Saved!', 'Your company profile has been updated.');
+  return updateCompanyProfile();
+}
+
+async function updateCompanyProfile() {
+  try {
+    const payload = {
+      companyName: document.getElementById('profileName')?.value.trim() || '',
+      industry: document.getElementById('profileIndustry')?.value.trim() || '',
+      location: document.getElementById('profileLocation')?.value.trim() || ''
+    };
+
+    let res = await fetch(`${API_BASE}/company/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showToast('Profile Saved!', 'Your company profile has been updated.');
+      if (user) {
+        user.name = payload.companyName || user.name;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      await fetchCompanyProfile();
+    } else {
+      let data = await res.json().catch(() => ({}));
+      showToast('Error', data.error || 'Failed to save profile', 'error');
+    }
+  } catch (err) {
+    showToast('Error', 'Server error while saving profile', 'error');
+  }
   return false;
 }
 
@@ -296,6 +356,7 @@ document.querySelector('.sidebar-logout').addEventListener('click', (e) => {
 // INIT
 window.onload = function() {
   document.querySelector('.topbar-greeting h2').innerHTML = `Welcome, ${user.name} <span class="wave">🏢</span>`;
+  fetchCompanyProfile();
   fetchInternships();
   fetchApplications();
 };

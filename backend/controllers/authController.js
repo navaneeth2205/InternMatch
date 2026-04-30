@@ -113,4 +113,56 @@ async function login(req, res) {
   }
 }
 
-module.exports = { register, login };
+// GET /api/company/profile
+async function getCompanyProfile(req, res) {
+  try {
+    const companyId = req.user.id;
+
+    const [rows] = await pool.query(
+      'SELECT company_name, email, location, industry FROM Companies WHERE company_id = ?',
+      [companyId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Company profile not found.' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Get company profile error:', err);
+    res.status(500).json({ error: 'Failed to fetch company profile.' });
+  }
+}
+
+// PUT /api/company/profile
+async function updateCompanyProfile(req, res) {
+  try {
+    const companyId = req.user.id;
+    const { companyName, location, industry } = req.body;
+
+    const [result] = await pool.query(
+      `UPDATE Companies
+       SET company_name = COALESCE(NULLIF(?, ''), company_name),
+           location = ?,
+           industry = ?
+       WHERE company_id = ?`,
+      [companyName, location || '', industry || '', companyId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Company profile not found.' });
+    }
+
+    res.json({ message: 'Company profile updated successfully.' });
+  } catch (err) {
+    console.error('Update company profile error:', err);
+    res.status(500).json({ error: 'Failed to update company profile.' });
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  getCompanyProfile,
+  updateCompanyProfile,
+};
