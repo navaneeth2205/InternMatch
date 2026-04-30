@@ -24,14 +24,17 @@ const sampleData = {
     { company_id: 2, company_name: 'DataWorks', email: 'contact@dataworks.com', password: '$2a$10$qrkD6vAg9RBMjI/WwbcUMeEE9/dJnezlJ8Vy9hdyqc2MkutUc5n7W', location: 'New York', industry: 'Data Analytics' }
   ],
   skills: [
-    { skill_id: 1, skill_name: 'JavaScript' },
+    { skill_id: 1, skill_name: 'Java' },
     { skill_id: 2, skill_name: 'Python' },
-    { skill_id: 3, skill_name: 'SQL' }
+    { skill_id: 3, skill_name: 'C++' },
+    { skill_id: 4, skill_name: 'JavaScript' },
+    { skill_id: 5, skill_name: 'React' },
+    { skill_id: 6, skill_name: 'SQL' }
   ],
   studentSkills: [
-    { student_id: 1, skill_id: 1, skill_level: 'Intermediate' },
-    { student_id: 1, skill_id: 2, skill_level: 'Advanced' },
-    { student_id: 2, skill_id: 3, skill_level: 'Beginner' }
+    { student_id: 1, skill_id: 2 },
+    { student_id: 1, skill_id: 4 },
+    { student_id: 2, skill_id: 6 }
   ],
   internships: [
     { id: 1, company_id: 1, skill_required: 'JavaScript', duration: '3 Months', stipend: 5000, location: 'Remote', description: 'Frontend dev internship', status: 'Active', created_at: new Date() },

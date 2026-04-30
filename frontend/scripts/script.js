@@ -151,15 +151,52 @@ function saveProfile() {
 // -------------------
 // SKILLS SYSTEM
 // -------------------
-function addSkill(skill) {
+async function syncSkillsToStorage() {
+  localStorage.setItem("skills", JSON.stringify(skills));
+}
+
+async function fetchSkills() {
+  try {
+    let res = await fetch(`${API_BASE}/skills`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (res.ok) {
+      skills = await res.json();
+      await syncSkillsToStorage();
+    }
+  } catch (err) {
+    console.error('Failed to fetch skills:', err);
+  }
+  displaySkills();
+  highlightSkills();
+  showInternships();
+  updateStats();
+}
+
+async function addSkill(skill) {
   if (!skills.includes(skill)) {
-    skills.push(skill);
-    localStorage.setItem("skills", JSON.stringify(skills));
-    displaySkills();
-    highlightSkills();
-    showInternships();
-    updateStats();
-    showToast("Skill Added!", `"${skill}" has been added to your profile.`);
+    try {
+      let res = await fetch(`${API_BASE}/skills`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ skill })
+      });
+
+      if (!res.ok) {
+        let data = await res.json().catch(() => ({}));
+        showToast("Notice", data.error || "Could not save skill", "error");
+        return;
+      }
+
+      await fetchSkills();
+      showToast("Skill Added!", `"${skill}" has been added to your profile.`);
+    } catch (err) {
+      showToast("Error", "Server error while saving skill.", "error");
+    }
   }
 }
 
@@ -187,15 +224,25 @@ function displaySkills() {
   });
 }
 
-function removeSkill(index) {
+async function removeSkill(index) {
   let removed = skills[index];
-  skills.splice(index, 1);
-  localStorage.setItem("skills", JSON.stringify(skills));
-  displaySkills();
-  highlightSkills();
-  showInternships();
-  updateStats();
-  showToast("Skill Removed", `"${removed}" has been removed from your profile.`);
+  try {
+    let res = await fetch(`${API_BASE}/skills/${encodeURIComponent(removed)}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!res.ok) {
+      let data = await res.json().catch(() => ({}));
+      showToast("Notice", data.error || "Could not remove skill", "error");
+      return;
+    }
+
+    await fetchSkills();
+    showToast("Skill Removed", `"${removed}" has been removed from your profile.`);
+  } catch (err) {
+    showToast("Error", "Server error while removing skill.", "error");
+  }
 }
 
 function highlightSkills() {
@@ -501,8 +548,7 @@ window.onload = function () {
   // Initial Data Fetch
   fetchInternships();
   fetchApplications();
-  displaySkills();
-  highlightSkills();
+  fetchSkills();
 
   // Add overlay element for mobile sidebar
   if (!document.getElementById("sidebarOverlay")) {

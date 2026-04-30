@@ -5,17 +5,16 @@
 
 const mysql = require('mysql2/promise');
 require('dotenv').config();
+const { resolveMysqlConfig, describeMysqlConfig } = require('./db-config');
+
+const dbConfig = resolveMysqlConfig({ includeDatabase: true });
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'internmatch',
-  port: process.env.DB_PORT || 3306,
-  ssl: process.env.DB_HOST && process.env.DB_HOST.includes('aivencloud') ? { rejectUnauthorized: false } : undefined,
+  ...dbConfig,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  connectTimeout: 10000,
 });
 
 // Test connection on startup
@@ -26,7 +25,9 @@ pool.getConnection()
   })
   .catch(err => {
     console.error('❌ MySQL connection failed:', err.message);
-    console.log('💡 Tip: Make sure MySQL is running and .env credentials are correct.');
+    console.log('🔎 Resolved MySQL config:', describeMysqlConfig(dbConfig));
+    console.log('💡 Tip: Check the DB host/port/user/password in your Render environment variables.');
+    console.log('💡 If you are using Aiven, verify the hostname exactly matches the public endpoint from Aiven.');
     process.exit(1);
   });
 

@@ -78,10 +78,7 @@ async function handleStudentLogin(e) {
       showToast(data.details ? `Error: ${data.details}` : (data.error || 'Login failed'), 'error');
     }
   } catch (err) {
-    // Fallback: allow login without backend for demo
-    localStorage.setItem('user', JSON.stringify({ name: 'Student', email, role: 'student' }));
-    showToast('Login successful! Redirecting...');
-    setTimeout(() => window.location.href = 'student.html', 1000);
+    showToast('Unable to reach backend. Start the server before logging in.', 'error');
   }
 
   return false;
@@ -123,8 +120,7 @@ async function handleStudentRegister(e) {
       showToast(data.error || 'Registration failed', 'error');
     }
   } catch (err) {
-    showToast('Account created! Redirecting to login...');
-    setTimeout(() => window.location.href = 'student-login.html', 1500);
+    showToast('Unable to reach backend. Start the server before registering.', 'error');
   }
 
   return false;
@@ -162,9 +158,7 @@ async function handleCompanyLogin(e) {
       showToast(data.error || 'Login failed', 'error');
     }
   } catch (err) {
-    localStorage.setItem('user', JSON.stringify({ name: 'Company', email, role: 'company' }));
-    showToast('Login successful! Redirecting...');
-    setTimeout(() => window.location.href = 'company.html', 1000);
+    showToast('Unable to reach backend. Start the server before logging in.', 'error');
   }
 
   return false;
@@ -204,8 +198,7 @@ async function handleCompanyRegister(e) {
       showToast(data.error || 'Registration failed', 'error');
     }
   } catch (err) {
-    showToast('Account created! Redirecting to login...');
-    setTimeout(() => window.location.href = 'company-login.html', 1500);
+    showToast('Unable to reach backend. Start the server before registering.', 'error');
   }
 
   return false;

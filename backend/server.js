@@ -33,8 +33,10 @@ app.get('/index.html', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const internshipRoutes = require('./routes/internshipRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const skillRoutes = require('./routes/skillRoutes');
 
 app.use('/api', authRoutes);
+app.use('/api', skillRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/api/applications', applicationRoutes);
 
